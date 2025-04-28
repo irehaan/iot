@@ -13,10 +13,10 @@ import com.atomcamp.iot_project.Screens.HomeScreen
 import com.atomcamp.iot_project.Screens.NamesScreen
 import com.atomcamp.iot_project.Screens.SplashScreen
 import androidx.navigation.compose.rememberNavController
-import androidx.navigation.NavGraph.Companion.findStartDestination
 import androidx.compose.animation.*
 import androidx.compose.animation.core.tween
 import androidx.compose.runtime.LaunchedEffect
+import androidx.compose.runtime.key
 import kotlinx.coroutines.delay
 
 class MainActivity : ComponentActivity() {
@@ -27,12 +27,20 @@ class MainActivity : ComponentActivity() {
             Iot_projectTheme {
                 val navController = rememberNavController()
 
-                // Override the back button behavior to close the app
-                // Adding this at the activity level ensures it applies to all screens
+                // Override the back button behavior to navigate to home screen or close the app
                 val backPressedCallback = object : OnBackPressedCallback(true) {
                     override fun handleOnBackPressed() {
-                        // This will finish the app when the back button is pressed from any screen
-                        finish()
+                        if (navController.currentDestination?.route != "home" &&
+                            navController.currentDestination?.route != "splash") {
+                            // Navigate to home and clear the entire back stack
+                            navController.navigate("home") {
+                                popUpTo(navController.graph.id) { inclusive = true }
+                                launchSingleTop = true
+                            }
+                        } else {
+                            // If on home or splash, finish the app
+                            finish()
+                        }
                     }
                 }
                 onBackPressedDispatcher.addCallback(this, backPressedCallback)
@@ -48,7 +56,7 @@ class MainActivity : ComponentActivity() {
 
                 NavHost(
                     navController = navController,
-                    startDestination = "splash" // Change start destination to splash
+                    startDestination = "splash"
                 ) {
                     composable(
                         "splash",
@@ -59,9 +67,9 @@ class MainActivity : ComponentActivity() {
 
                         // Automatically navigate to home screen after delay
                         LaunchedEffect(key1 = true) {
-                            delay(2000) // 2 seconds delay, adjust as needed
+                            delay(2000) // 2 seconds delay
                             navController.navigate("home") {
-                                popUpTo("splash") { inclusive = true }
+                                popUpTo(navController.graph.id) { inclusive = true }
                             }
                         }
                     }
@@ -71,142 +79,116 @@ class MainActivity : ComponentActivity() {
                         enterTransition = fadeEnterTransition,
                         exitTransition = fadeExitTransition
                     ) {
-                        HomeScreen(
-                            onNavigateToDevices = {
-                                // Navigate without saving state
-                                navController.navigate("devices") {
-                                    // Clear the entire back stack when navigating
-                                    popUpTo(navController.graph.findStartDestination().id) {
-                                        saveState = false
+                        // Using key forces recomposition
+                        key(Unit) {
+                            HomeScreen(
+                                onNavigateToDevices = {
+                                    navController.navigate("devices") {
+                                        popUpTo(navController.graph.id) { inclusive = true }
+                                        launchSingleTop = true
                                     }
-                                    launchSingleTop = true
-                                    restoreState = false
-                                }
-                            },
-                            onNavigateToNames = {
-                                navController.navigate("names") {
-                                    popUpTo(navController.graph.findStartDestination().id) {
-                                        saveState = false
+                                },
+                                onNavigateToNames = {
+                                    navController.navigate("names") {
+                                        popUpTo(navController.graph.id) { inclusive = true }
+                                        launchSingleTop = true
                                     }
-                                    launchSingleTop = true
-                                    restoreState = false
-                                }
-                            },
-                            onNavigateToAbout = {
-                                navController.navigate("about") {
-                                    popUpTo(navController.graph.findStartDestination().id) {
-                                        saveState = false
+                                },
+                                onNavigateToAbout = {
+                                    navController.navigate("about") {
+                                        popUpTo(navController.graph.id) { inclusive = true }
+                                        launchSingleTop = true
                                     }
-                                    launchSingleTop = true
-                                    restoreState = false
                                 }
-                            }
-                        )
+                            )
+                        }
                     }
+
                     composable(
                         "devices",
                         enterTransition = fadeEnterTransition,
                         exitTransition = fadeExitTransition
                     ) {
-                        DevicesScreen(
-                            onNavigateToHome = {
-                                navController.navigate("home") {
-                                    popUpTo(navController.graph.findStartDestination().id) {
-                                        saveState = false
+                        key(Unit) {
+                            DevicesScreen(
+                                onNavigateToHome = {
+                                    navController.navigate("home") {
+                                        popUpTo(navController.graph.id) { inclusive = true }
+                                        launchSingleTop = true
                                     }
-                                    launchSingleTop = true
-                                    restoreState = false
-                                }
-                            },
-                            onNavigateToNames = {
-                                navController.navigate("names") {
-                                    popUpTo(navController.graph.findStartDestination().id) {
-                                        saveState = false
+                                },
+                                onNavigateToNames = {
+                                    navController.navigate("names") {
+                                        popUpTo(navController.graph.id) { inclusive = true }
+                                        launchSingleTop = true
                                     }
-                                    launchSingleTop = true
-                                    restoreState = false
-                                }
-                            },
-                            onNavigateToAbout = {
-                                navController.navigate("about") {
-                                    popUpTo(navController.graph.findStartDestination().id) {
-                                        saveState = false
+                                },
+                                onNavigateToAbout = {
+                                    navController.navigate("about") {
+                                        popUpTo(navController.graph.id) { inclusive = true }
+                                        launchSingleTop = true
                                     }
-                                    launchSingleTop = true
-                                    restoreState = false
                                 }
-                            }
-                        )
+                            )
+                        }
                     }
+
                     composable(
                         "names",
                         enterTransition = fadeEnterTransition,
                         exitTransition = fadeExitTransition
                     ) {
-                        NamesScreen(
-                            onNavigateToHome = {
-                                navController.navigate("home") {
-                                    popUpTo(navController.graph.findStartDestination().id) {
-                                        saveState = false
+                        key(Unit) {
+                            NamesScreen(
+                                onNavigateToHome = {
+                                    navController.navigate("home") {
+                                        popUpTo(navController.graph.id) { inclusive = true }
+                                        launchSingleTop = true
                                     }
-                                    launchSingleTop = true
-                                    restoreState = false
-                                }
-                            },
-                            onNavigateToDevices = {
-                                navController.navigate("devices") {
-                                    popUpTo(navController.graph.findStartDestination().id) {
-                                        saveState = false
+                                },
+                                onNavigateToDevices = {
+                                    navController.navigate("devices") {
+                                        popUpTo(navController.graph.id) { inclusive = true }
+                                        launchSingleTop = true
                                     }
-                                    launchSingleTop = true
-                                    restoreState = false
-                                }
-                            },
-                            onNavigateToAbout = {
-                                navController.navigate("about") {
-                                    popUpTo(navController.graph.findStartDestination().id) {
-                                        saveState = false
+                                },
+                                onNavigateToAbout = {
+                                    navController.navigate("about") {
+                                        popUpTo(navController.graph.id) { inclusive = true }
+                                        launchSingleTop = true
                                     }
-                                    launchSingleTop = true
-                                    restoreState = false
                                 }
-                            }
-                        )
+                            )
+                        }
                     }
+
                     composable(
                         "about",
                         enterTransition = fadeEnterTransition,
                         exitTransition = fadeExitTransition
                     ) {
-                        AboutScreen(
-                            onNavigateToHome = {
-                                navController.navigate("home") {
-                                    popUpTo(navController.graph.findStartDestination().id) {
-                                        saveState = false
+                        key(Unit) {
+                            AboutScreen(
+                                onNavigateToHome = {
+                                    navController.navigate("home") {
+                                        popUpTo(navController.graph.id) { inclusive = true }
+                                        launchSingleTop = true
                                     }
-                                    launchSingleTop = true
-                                    restoreState = false
-                                }
-                            },
-                            onNavigateToDevices = {
-                                navController.navigate("devices") {
-                                    popUpTo(navController.graph.findStartDestination().id) {
-                                        saveState = false
+                                },
+                                onNavigateToDevices = {
+                                    navController.navigate("devices") {
+                                        popUpTo(navController.graph.id) { inclusive = true }
+                                        launchSingleTop = true
                                     }
-                                    launchSingleTop = true
-                                    restoreState = false
-                                }
-                            },
-                            onNavigateToNames = {
-                                navController.navigate("names") {
-                                    popUpTo(navController.graph.findStartDestination().id) {
-                                        saveState = false
+                                },
+                                onNavigateToNames = {
+                                    navController.navigate("names") {
+                                        popUpTo(navController.graph.id) { inclusive = true }
+                                        launchSingleTop = true
                                     }
-                                    launchSingleTop = true
-                                    restoreState = false
                                 }
-                            }
-                        )
+                            )
+                        }
                     }
                 }
             }
