@@ -17,6 +17,8 @@ import androidx.compose.material3.TextField
 import androidx.compose.material3.TextFieldDefaults
 import androidx.compose.material3.AlertDialog
 import androidx.compose.material3.Scaffold
+import androidx.compose.material3.SnackbarHost
+import androidx.compose.material3.SnackbarHostState
 import androidx.compose.runtime.*
 import androidx.compose.ui.Alignment
 import androidx.compose.ui.Modifier
@@ -33,6 +35,7 @@ import androidx.compose.ui.unit.dp
 import androidx.compose.ui.unit.sp
 import com.atomcamp.iot_project.PreferenceManager
 import com.atomcamp.iot_project.R
+import kotlinx.coroutines.launch
 
 @SuppressLint("RememberReturnType")
 @Composable
@@ -53,8 +56,13 @@ fun NamesScreen(
         "Lounge Fan"
     )
 
+    // Define character limit for device names
+    val nameCharacterLimit = 25
+
     val context = LocalContext.current
     val prefManager = remember(context) { PreferenceManager(context) }
+    val snackbarHostState = remember { SnackbarHostState() }
+    val coroutineScope = rememberCoroutineScope()
 
     // Load names from preferences when initializing
     val customizedNames = remember {
@@ -73,6 +81,7 @@ fun NamesScreen(
     var selectedDeviceName by remember { mutableStateOf("") }
     var selectedIndex by remember { mutableStateOf(0) }
     var newName by remember { mutableStateOf("") }
+    var isLimitReached by remember { mutableStateOf(false) }
 
     Box(modifier = Modifier.fillMaxSize()) {
         // Background Image with enhanced contrast
@@ -97,6 +106,7 @@ fun NamesScreen(
                     onAboutClick = onNavigateToAbout
                 )
             },
+            snackbarHost = { SnackbarHost(snackbarHostState) },
             containerColor = Color.Transparent
         ) { innerPadding ->
             Column(
@@ -197,6 +207,7 @@ fun NamesScreen(
                                         selectedDeviceName = defaultName
                                         selectedIndex = index
                                         newName = customizedNames.value[defaultName] ?: defaultName
+                                        isLimitReached = false
                                         showDialog = true
                                     }
                                     .padding(horizontal = 16.dp, vertical = 17.dp),
@@ -247,26 +258,56 @@ fun NamesScreen(
                     )
                 },
                 text = {
-                    TextField(
-                        value = newName,
-                        onValueChange = { newName = it },
-                        label = {
+                    Column {
+                        TextField(
+                            value = newName,
+                            onValueChange = { input ->
+                                if (input.length <= nameCharacterLimit) {
+                                    newName = input
+                                    isLimitReached = false
+                                } else {
+                                    newName = input.take(nameCharacterLimit)
+                                    isLimitReached = true
+                                    // Show notification when character limit is reached
+                                    coroutineScope.launch {
+                                        snackbarHostState.showSnackbar("Name Limit Reached")
+                                    }
+                                }
+                            },
+                            label = {
+                                Text(
+                                    text = "Enter new name",
+                                    color = Color.Black
+                                )
+                            },
+                            colors = TextFieldDefaults.colors(
+                                focusedContainerColor = Color.White,
+                                unfocusedContainerColor = Color.White,
+                                focusedIndicatorColor = Color.Black,
+                                unfocusedIndicatorColor = Color.Black,
+                                cursorColor = Color.Black,
+                                focusedLabelColor = Color.Black,
+                                unfocusedLabelColor = Color.Black
+                            ),
+                            singleLine = true
+                        )
+
+                        if (isLimitReached) {
+                            Spacer(modifier = Modifier.height(8.dp))
                             Text(
-                                text = "Enter new name",
-                                color = Color.Black
+                                text = "Name Limit Reached",
+                                color = Color(0xFFFF5722),
+                                fontSize = 14.sp
                             )
-                        },
-                        colors = TextFieldDefaults.colors(
-                            focusedContainerColor = Color.White,
-                            unfocusedContainerColor = Color.White,
-                            focusedIndicatorColor = Color.Black,
-                            unfocusedIndicatorColor = Color.Black,
-                            cursorColor = Color.Black,
-                            focusedLabelColor = Color.Black,
-                            unfocusedLabelColor = Color.Black
-                        ),
-                        singleLine = true
-                    )
+                        }
+
+                        Spacer(modifier = Modifier.height(4.dp))
+                        Text(
+                            text = "${newName.length}/$nameCharacterLimit characters",
+                            color = Color.White,
+                            fontSize = 12.sp
+                        )
+                    }
                 },
                 confirmButton = {
                     Button(
@@ -274,6 +315,10 @@ fun NamesScreen(
                             val updatedMap = customizedNames.value.toMutableMap()
                             updatedMap[selectedDeviceName] = newName
                             customizedNames.value = updatedMap
+
+                            // Save the updated name to preferences
+                            prefManager.setDeviceName(selectedIndex + 1, newName)
+
                             showDialog = false
                         },
                         colors = ButtonDefaults.buttonColors(containerColor = Color(0xFF8BC34A))
