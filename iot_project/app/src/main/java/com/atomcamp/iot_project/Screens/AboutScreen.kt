@@ -202,7 +202,7 @@ fun AboutScreen(
                 Box(
                     modifier = Modifier
                         .fillMaxWidth()
-                        .background(Color(0xFFF5F5F5), shape = RoundedCornerShape(2.dp))
+                        .background(Color(0xFFF5F5F5), shape = RoundedCornerShape(4.dp))
                         .padding(start = 14.dp, end = 14.dp, top = 14.dp, bottom = 14.dp)
                 ) {
                     val bullet = "•"

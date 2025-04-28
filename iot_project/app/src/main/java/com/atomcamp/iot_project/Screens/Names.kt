@@ -159,7 +159,7 @@ fun NamesScreen(
                             }
                         }
 
-                        Spacer(modifier = Modifier.height(8.dp))
+                        Spacer(modifier = Modifier.height(4.dp))
 
                         Text(
                             text = "Touch a name to",
@@ -192,11 +192,14 @@ fun NamesScreen(
                 }
 
                 // Middle gray area with device names - SOLID color
+
                 Box(
                     modifier = Modifier
                         .fillMaxWidth()
-                        .background(Color(0xFFE0E0E0)) // Solid gray (no transparency)
-                        .padding(vertical = 4.dp)
+                        .padding(horizontal = 16.dp)
+                        .offset(y = (-30).dp)
+                        .background(Color(0xFFF5F5F5), shape = RoundedCornerShape(4.dp))
+                        .padding(vertical = 2.dp)
                 ) {
                     LazyColumn {
                         items(defaultDeviceNames.withIndex().toList()) { (index, defaultName) ->
@@ -241,7 +244,7 @@ fun NamesScreen(
                         modifier = Modifier.fillMaxWidth(),
                         horizontalArrangement = Arrangement.spacedBy(60.dp)
                     ) {
-                        // Your buttons code would go here
+
                     }
                 }
             }
@@ -280,6 +283,7 @@ fun NamesScreen(
                                     color = Color.Black
                                 )
                             },
+                            textStyle = TextStyle(color = Color.Black),
                             colors = TextFieldDefaults.colors(
                                 focusedContainerColor = Color.White,
                                 unfocusedContainerColor = Color.White,
@@ -323,7 +327,7 @@ fun NamesScreen(
                         },
                         colors = ButtonDefaults.buttonColors(containerColor = Color(0xFF8BC34A))
                     ) {
-                        Text("Confirm", color = Color.White)
+                        Text("Save", color = Color.White)
                     }
                 },
                 dismissButton = {
