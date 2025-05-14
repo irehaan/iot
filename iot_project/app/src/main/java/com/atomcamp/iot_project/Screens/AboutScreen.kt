@@ -207,7 +207,7 @@ fun AboutScreen(
                 ) {
                     val bullet = "•"
                     val bulletGap = "  "
-                    val whatsappUrl = "https://wa.me/message/LMNKIANS47YRL1"
+                    val whatsappUrl = "https://wa.me/message/"
 
                     val annotatedString = buildAnnotatedString {
                         val bodyStyle = SpanStyle(fontSize = 21.5.sp)
@@ -251,7 +251,7 @@ fun AboutScreen(
                         }
 
                         withStyle(style = contactStyle) {
-                            append("+92-348-7045240\n")
+                            append("\n")
                         }
 
                         pushStringAnnotation(tag = linkTag, annotation = whatsappUrl)
@@ -272,7 +272,7 @@ fun AboutScreen(
                         }
 
                         withStyle(style = linkStyle) {
-                            append("https://wa.me/message/LMNKIANS47YRL1")  // Changed text to be more descriptive
+                            append("https://wa.me/message/")  
                         }
                         pop()
                     }
